@@ -30,15 +30,15 @@ jobs:
           AWS_REGION: us-east-1
         run: |
           echo "Logging in to Amazon ECR..."
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPO
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs
 
       - name: Build Docker image
         run: |
-          docker build -t $ECR_REPO:latest .
+          docker build -t 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:latest .
 
       - name: Push Docker image to ECR
         run: |
-          docker push $ECR_REPO:latest
+          docker push 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:latest
 
       - name: Deploy to ECS
         id: deploy
@@ -46,8 +46,8 @@ jobs:
           echo "Deploying to ECS..."
           echo "${{ github.sha }}" > last_stable_tag.txt
           echo "Last stable tag is ${{ github.sha }}."
-          docker tag $ECR_REPO:latest $ECR_REPO:${{ github.sha }}
-          docker push $ECR_REPO:${{ github.sha }}
+          docker tag 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:latest $ECR_REPO:${{ github.sha }}
+          docker push 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:${{ github.sha }}
 
       - name: Rollback if deployment fails
         if: failure()
@@ -55,6 +55,6 @@ jobs:
           echo "Deployment failed. Rolling back to the last stable version..."
           LAST_STABLE_TAG=$(cat last_stable_tag.txt)
           echo "Rolling back to ${LAST_STABLE_TAG}..."
-          docker tag $ECR_REPO:${LAST_STABLE_TAG} $ECR_REPO:latest
-          docker push $ECR_REPO:latest
+          docker tag 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:${LAST_STABLE_TAG} 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:latest
+          docker push 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:latest
           echo "Rollback complete."
