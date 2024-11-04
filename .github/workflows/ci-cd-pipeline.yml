@@ -14,6 +14,13 @@ jobs:
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+        
+      - name: Set environment variables
+        env:
+          AWS_REGION: us-east-1
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          ECR_REPO: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/hello-ecs
+          run: echo "Setting AWS region to $AWS_REGION and ECR repository to $ECR_REPO"
 
       - name: Login to ECR
         env:
@@ -32,3 +39,27 @@ jobs:
       - name: Push Docker image to ECR
         run: |
           docker push 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:latest
+
+      - name: Deploy to ECS
+        id: deploy
+        run: |
+          # Your deployment command here
+          echo "Deploying to ECS..."
+          # Simulating deployment success
+          # If successful, tag the image with the commit hash
+          echo "${{ github.sha }}" > last_stable_tag.txt
+          echo "Last stable tag is ${GITHUB_SHA}."  # Save the commit SHA as the last stable tag
+          docker tag $ECR_REPO:latest $ECR_REPO:${{ github.sha }}
+          docker push $ECR_REPO:${{ github.sha }}
+
+      - name: Rollback if deployment fails
+        if: failure()  # This step runs only if the previous steps failed
+        run: |
+          echo "Deployment failed. Rolling back to the last stable version..."
+          # Read the last stable tag from the saved file
+          LAST_STABLE_TAG=$(cat last_stable_tag.txt)
+          echo "Rolling back to ${LAST_STABLE_TAG}..."
+          # Redeploy the last stable image
+          docker tag $ECR_REPO:${LAST_STABLE_TAG} $ECR_REPO:latest
+          docker push $ECR_REPO:latest
+          echo "Rollback complete."
