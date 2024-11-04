@@ -19,8 +19,8 @@ jobs:
         env:
           AWS_REGION: us-east-1             # Static AWS region
           AWS_ACCOUNT_ID: 365299945243      # Static AWS account ID
-          ECR_REPO: 365299945243.dkr.ecr.$AWS_REGION.amazonaws.com/hello-ecs
-        run: echo "Setting AWS region to $AWS_REGION and ECR repository to $ECR_REPO"
+          ECR_REPO: 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs
+        run: echo "Setting AWS region to us-east-1 and ECR repository to $ECR_REPO"
 
       - name: Login to ECR
         env:
@@ -30,7 +30,7 @@ jobs:
           AWS_REGION: us-east-1
         run: |
           echo "Logging in to Amazon ECR..."
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPO
 
       - name: Build Docker image
         run: |
