@@ -23,12 +23,12 @@ jobs:
           AWS_REGION: us-east-1  # Change to your region
         run: |
           echo "Logging in to Amazon ECR..."
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 365299945243.dkr.ecr.$AWS_REGION.amazonaws.com
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 365299945243.dkr.ecr.us-east-1.amazonaws.com
 
       - name: Build Docker image
         run: |
-          docker build -t 365299945243.dkr.ecr.$AWS_REGION.amazonaws.com/hello-ecs:latest .
+          docker build -t 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:latest .
 
       - name: Push Docker image to ECR
         run: |
-          docker push 365299945243.dkr.ecr.$AWS_REGION.amazonaws.com/hello-ecs:latest
+          docker push 365299945243.dkr.ecr.us-east-1.amazonaws.com/hello-ecs:latest
